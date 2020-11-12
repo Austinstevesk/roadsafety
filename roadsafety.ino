@@ -1,5 +1,10 @@
 #include <LiquidCrystal.h> //LCD library
 #include <SoftwareSerial.h>
+#include "DHT.h"
+#define DHTPIN 11        // Where you have connected you DHT Sensor
+#define DHTTYPE DHT11    // Defines the type of the sensor
+//#define DHTTYPE DHT22    // Uncomment this line if you are using DHT22 sensor
+DHT dht(DHTPIN, DHTTYPE);
 SoftwareSerial sim(9, 10); //Rx, Tx
 LiquidCrystal lcd(2,3,4,5,6,7);//RS, E, D4, D5, D6, D7
 String number = "+2547.....";
@@ -11,7 +16,8 @@ int _timeout;
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  sim.begin(9600);
+  sim.begin(9600); //Begins communication with the gsm
+  dht.begin();// Begins the communication with the temperature sensor
   lcd.begin(16,2);
   Serial.println("System started"); 
    lcd.setCursor(1,0);
@@ -25,38 +31,60 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
 
-    int sensorval = analogRead(A0);
+  int count = 0;
+    
+  float h = dht.readHumidity();         // reads the humidy and stores on the float variable named h
+  float t = dht.readTemperature();      // reads the temperature and stores on the float variable named t
 
-    Serial.print("\nAnalogValue: ");
-    Serial.print(sensorval);
-    percentval = map(sensorval, 1023, 200, 0, 100);
-    Serial.print("\nPercentval: ");
-    Serial.print(percentval);
-    Serial.println(" ");
-    //Serial.println(percentval);
+  Serial.print("Humidity: ");           // prints the message Humidity: on the serial monitor
+  Serial.print(h);                      // prints the humidity value on the serial monitor
+  Serial.println();                     // goes to the next line on the serial monitor
+ 
+  lcd.clear();                          // clears the LCD
+  lcd.setCursor(0, 0);                  // sets the cursor on the first line
+  lcd.print("Humidity:");               // prints the message Humidity: on the LCD
+  lcd.setCursor(10, 0);                 // sets the cursor on the 10th column on the LCD
+  lcd.print(h);                         // prints the humidity value on the LCD
 
-    if(percentval > 30){
+  Serial.print("Temperature: ");        // prints the message Temperature: on the serial monitor 
+  Serial.print(t);                      // prints the temperature value on the serial monitor
+  Serial.println();                     // goes to the next line on the serial monitor
+
+  lcd.setCursor(0, 1);                  //sets the cursor on the bottom line on the LCD
+  lcd.print("Temperature:");            //prints the message Temperature on the LCD
+  lcd.setCursor(13, 1);                 //sets the cursor on the 13 column on the bottom
+  lcd.print(t);                         //prints the temperature value on the lcd
+
+  if (isnan(h) || isnan(t)) {                    //This if statement check to see if the DHT sensor is connected or disconnected
+    Serial.println("Sensor is not connected");   //prints the message sensor is not connected on the serial monitor  
+    lcd.clear();                                 // clears the lcd
+    lcd.setCursor(0, 0);                         // sets the cursor on the bottom on the lcd
+    lcd.print("DHT Disconnected");                   // prints Disconnected on the lcd
+    return;                                      // return from the if statement
+  }
+  
+    if(h > 60){
         Serial.print("Red Alert\n");
-        redAlertOn();
         lcd.setCursor(3,1);
         lcd.print("Red alert");
+        while (count<1){
+          redAlertOn();
+          count++;
+        }
         red_alert = true;   
     }
 
     else{
       Serial.println("No red alert");
-      redAlertOff();
       lcd.setCursor(1,1);
-      lcd.print("Red alert Off");     
+      lcd.print("Red alert Off"); 
+              while (count<1){
+          redAlertOn();
+          count++;
+        }    
       red_alert = false;
       
     }
-    
-
-  delay(1000);
-  lcd.setCursor(6,0);
-  lcd.print(percentval);
-
   
 }
 
@@ -72,7 +100,7 @@ void loop() {
       delay(1000);
       char value[5];
       itoa(percentval,value,10); //convert integer to char array      
-      String SMS = "Red alert on!! Humidity value is "+String(value);
+      String SMS = "Red alert on!! RH value is "+String(value);
       sim.println(SMS);
       Serial.println(SMS);
       delay(100);
@@ -93,7 +121,7 @@ void loop() {
       delay(1000);
       char value[5];
       itoa(percentval,value,10); //convert integer to char array      
-      String SMS = "Red alert off!! Humidity value is "+String(value);
+      String SMS = "Red alert off!! RH value is "+String(value);
       sim.println(SMS);
       Serial.println(SMS);
       delay(100);
