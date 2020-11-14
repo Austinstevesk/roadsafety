@@ -11,7 +11,9 @@ String number = "+254797277217";
 bool red_alert = false;
 float h;
 int _timeout;
-
+long duration, inches, cm;
+const int pingPin = 12; // Trigger Pin of Ultrasonic Sensor
+const int echoPin = 13; // Echo Pin of Ultrasonic Sensor
 
 void setup() {
   // put your setup code here, to run once:
@@ -91,10 +93,34 @@ void loop() {
         }
       
     }
-  
+   pinMode(pingPin, OUTPUT);
+   digitalWrite(pingPin, LOW);
+   delayMicroseconds(2);
+   digitalWrite(pingPin, HIGH);
+   delayMicroseconds(10);
+   digitalWrite(pingPin, LOW);
+   pinMode(echoPin, INPUT);
+   duration = pulseIn(echoPin, HIGH);
+   inches = microsecondsToInches(duration);
+   int dist = microsecondsToCentimeters(duration);
+
+   if(dist < 50){
+    Serial.println("Slow down, car ahead");
+    lcd.clear();
+    lcd.setCursor(2,1);
+    lcd.print("Car Ahead!!");
+   }
+   delay(1000);
 }
 
 
+long microsecondsToInches(long microseconds) {
+   return microseconds / 74 / 2;
+}
+
+long microsecondsToCentimeters(long microseconds) {
+   return microseconds / 29 / 2;
+}
 
    void redAlertOn()
     {
