@@ -64,7 +64,18 @@ void loop() {
     lcd.print("Disconnected");                   // prints Disconnected on the lcd
     return;                                      // return from the if statement
   }
-  
+   pinMode(pingPin, OUTPUT);
+   digitalWrite(pingPin, LOW);
+   delayMicroseconds(2);
+   digitalWrite(pingPin, HIGH);
+   delayMicroseconds(10);
+   digitalWrite(pingPin, LOW);
+   pinMode(echoPin, INPUT);
+   duration = pulseIn(echoPin, HIGH);
+   inches = microsecondsToInches(duration);
+   int dist = microsecondsToCentimeters(duration);
+   delay(1000);
+
     if(h > 60){
         Serial.print("Red Alert\n");
         lcd.clear();
@@ -77,6 +88,14 @@ void loop() {
           }
           red_alert = true;
         }
+        
+   if(dist < 50){
+    Serial.println("Slow down, car ahead");
+    lcd.clear();
+    lcd.setCursor(2,1);
+    lcd.print("Car Ahead!!");
+    carAhead();
+   }
     }
 
     else{
@@ -93,25 +112,6 @@ void loop() {
         }
       
     }
-   pinMode(pingPin, OUTPUT);
-   digitalWrite(pingPin, LOW);
-   delayMicroseconds(2);
-   digitalWrite(pingPin, HIGH);
-   delayMicroseconds(10);
-   digitalWrite(pingPin, LOW);
-   pinMode(echoPin, INPUT);
-   duration = pulseIn(echoPin, HIGH);
-   inches = microsecondsToInches(duration);
-   int dist = microsecondsToCentimeters(duration);
-
-   if(dist < 50){
-    Serial.println("Slow down, car ahead");
-    lcd.clear();
-    lcd.setCursor(2,1);
-    lcd.print("Car Ahead!!");
-    carAhead();
-   }
-   delay(1000);
 }
 
 
