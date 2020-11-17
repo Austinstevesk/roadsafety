@@ -109,6 +109,7 @@ void loop() {
     lcd.clear();
     lcd.setCursor(2,1);
     lcd.print("Car Ahead!!");
+    carAhead();
    }
    delay(1000);
 }
@@ -162,6 +163,24 @@ long microsecondsToCentimeters(long microseconds) {
       //_buffer = _readSerial();
     }
     
+    void carAhead()
+    {
+      Serial.println ("Sending Message..........\n");
+      sim.println("AT+CMGF=1");    //Sets the GSM Module in Text Mode
+      delay(1000);
+      //Serial.println ("Set SMS Number");
+      sim.println("AT+CMGS=\"" + number + "\"\r"); //Mobile phone number to send message
+      delay(1000);
+      //char value[5];
+      //itoa(h,value,10); //convert integer to char array      
+      String SMS = "Slow down! There is a car ahead";
+      sim.println(SMS);
+      Serial.println(SMS);
+      delay(100);
+      sim.println((char)26);// ASCII code of CTRL+Z
+      delay(1000);
+      //_buffer = _readSerial();
+    }
     String _readSerial() {
       _timeout = 0;
       while(!sim.available() && _timeout < 12000  )
