@@ -74,11 +74,19 @@ void loop() {
    duration = pulseIn(echoPin, HIGH);
    inches = microsecondsToInches(duration);
    int dist = microsecondsToCentimeters(duration);
-   delay(1000);
+   Serial.println();
+   Serial.print("Distance: ");
+   Serial.print(dist);
+   Serial.println();
+   
 
     if(h > 60){
         Serial.print("Red Alert\n");
         lcd.clear();
+        lcd.setCursor(0, 0);                  // sets the cursor on the first line
+        lcd.print("Humidity:");               // prints the message Humidity: on the LCD
+        lcd.setCursor(10, 0);                 // sets the cursor on the 10th column on the LCD
+        lcd.print(h); 
         lcd.setCursor(3,1);
         lcd.print("It's foggy");
         while(red_alert  == false){
@@ -92,15 +100,23 @@ void loop() {
    if(dist < 50){
     Serial.println("Slow down, car ahead");
     lcd.clear();
+    lcd.setCursor(0, 0);                  // sets the cursor on the first line
+    lcd.print("Humidity:");               // prints the message Humidity: on the LCD
+    lcd.setCursor(10, 0);                 // sets the cursor on the 10th column on the LCD
+    lcd.print(h); 
     lcd.setCursor(2,1);
     lcd.print("Car Ahead!!");
-    carAhead();
+    //carAhead();
    }
     }
 
     else{
       Serial.println("No red alert");
       lcd.clear();
+      lcd.setCursor(0, 0);                  // sets the cursor on the first line
+      lcd.print("Humidity:");               // prints the message Humidity: on the LCD
+      lcd.setCursor(10, 0);                 // sets the cursor on the 10th column on the LCD
+      lcd.print(h);
       lcd.setCursor(4,1);
       lcd.print("No fog"); 
         while(red_alert){
@@ -112,6 +128,7 @@ void loop() {
         }
       
     }
+    delay(1000);
 }
 
 
@@ -163,7 +180,7 @@ long microsecondsToCentimeters(long microseconds) {
       //_buffer = _readSerial();
     }
     
-    void carAhead()
+    /*void carAhead()
     {
       Serial.println ("Sending Message..........\n");
       sim.println("AT+CMGF=1");    //Sets the GSM Module in Text Mode
@@ -192,4 +209,4 @@ long microsecondsToCentimeters(long microseconds) {
         return sim.readString();
         Serial.print("sms sent");
       }
-    }
+    }*/
