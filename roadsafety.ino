@@ -64,6 +64,8 @@ void loop() {
     lcd.print("Disconnected");                   // prints Disconnected on the lcd
     return;                                      // return from the if statement
   }
+
+   //check the distance between 2 cars.
    pinMode(pingPin, OUTPUT);
    digitalWrite(pingPin, LOW);
    delayMicroseconds(2);
